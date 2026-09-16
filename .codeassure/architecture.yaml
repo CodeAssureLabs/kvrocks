@@ -3,7 +3,7 @@ manifest_version: 1
 repo: CodeAssureLabs/kvrocks
 layers:
   entry: [api, service, domain, data]
-  api: [entry, service, domain, data]
+  api: [service, domain, data]
   service: [domain, data]
   domain: [data]
   data: []
