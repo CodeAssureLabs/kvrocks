@@ -27,10 +27,14 @@
 #include <string>
 #include <vector>
 
-#include "storage.h"
+#include "storage/storage.h"
 
 /// WriteBatchIndexer traverses the operations in WriteBatch and appends to the
 /// specified WriteBatchWithIndex.
+///
+/// It only stages operations into the context's batch; nothing is committed to the
+/// DB here, so registered engine::IndexHook instances are not notified until the
+/// batch is committed through Storage::Write.
 class WriteBatchIndexer : public rocksdb::WriteBatch::Handler {
  public:
   explicit WriteBatchIndexer(engine::Storage* storage, rocksdb::WriteBatchWithIndex* dest_batch,

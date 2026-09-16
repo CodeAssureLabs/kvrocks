@@ -104,3 +104,54 @@ TEST_F(WriteBatchIndexerTest, SingleDelete) {
   s = ctx_->batch->GetFromBatchAndDB(storage_->GetDB(), rocksdb::ReadOptions(), "key", &value);
   EXPECT_TRUE(s.IsNotFound());
 }
+
+namespace {
+
+struct CountingIndexHook : engine::IndexHook {
+  int committed = 0;
+  int last_batch_count = 0;
+
+  void OnWriteCommitted(engine::Context& /*ctx*/, const rocksdb::WriteBatch& updates) override {
+    committed++;
+    last_batch_count = updates.Count();
+  }
+};
+
+}  // namespace
+
+TEST_F(WriteBatchIndexerTest, IndexHookNotifiedOnlyWhenCommitted) {
+  CountingIndexHook hook;
+  storage_->RegisterIndexHook(&hook);
+  storage_->RegisterIndexHook(&hook);  // registering twice is a no-op
+  EXPECT_EQ(storage_->IndexHookCount(), 1u);
+
+  rocksdb::WriteBatch batch;
+  auto s = batch.Put("key0", "value0");
+  EXPECT_TRUE(s.ok()) << s.ToString();
+
+  // Staging into the context batch does not commit anything, so hooks stay quiet.
+  ctx_->batch = std::make_unique<rocksdb::WriteBatchWithIndex>();
+  WriteBatchIndexer handle(*ctx_);
+  s = batch.Iterate(&handle);
+  EXPECT_TRUE(s.ok()) << s.ToString();
+  EXPECT_EQ(hook.committed, 0);
+
+  // Committing through Storage::Write notifies the hook with the committed batch.
+  rocksdb::WriteBatch commit_batch;
+  s = commit_batch.Put("key1", "value1");
+  EXPECT_TRUE(s.ok()) << s.ToString();
+  s = storage_->Write(*ctx_, rocksdb::WriteOptions(), &commit_batch);
+  EXPECT_TRUE(s.ok()) << s.ToString();
+  EXPECT_EQ(hook.committed, 1);
+  EXPECT_GE(hook.last_batch_count, 1);
+
+  storage_->UnregisterIndexHook(&hook);
+  EXPECT_EQ(storage_->IndexHookCount(), 0u);
+
+  rocksdb::WriteBatch another_batch;
+  s = another_batch.Put("key2", "value2");
+  EXPECT_TRUE(s.ok()) << s.ToString();
+  s = storage_->Write(*ctx_, rocksdb::WriteOptions(), &another_batch);
+  EXPECT_TRUE(s.ok()) << s.ToString();
+  EXPECT_EQ(hook.committed, 1);
+}

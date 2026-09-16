@@ -433,4 +433,9 @@ Status GlobalIndexer::Update(engine::Context &ctx, const RecordResult &original)
   return original.updater->Update(ctx, original.fields, original.key);
 }
 
+void GlobalIndexer::OnWriteCommitted([[maybe_unused]] engine::Context &ctx,
+                                     [[maybe_unused]] const rocksdb::WriteBatch &updates) {
+  write_epoch_.fetch_add(1, std::memory_order_acq_rel);
+}
+
 }  // namespace redis

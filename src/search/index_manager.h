@@ -30,12 +30,19 @@
 
 namespace redis {
 
+/// IndexManager owns the lifecycle of the search indexes and, with it, the
+/// registration of the GlobalIndexer as the storage engine's index hook.
+/// `indexer` and `storage` must outlive the manager.
 struct IndexManager {
   kqir::IndexMap index_map;
   GlobalIndexer *indexer;
   engine::Storage *storage;
 
-  IndexManager(GlobalIndexer *indexer, engine::Storage *storage) : indexer(indexer), storage(storage) {}
+  IndexManager(GlobalIndexer *indexer, engine::Storage *storage);
+  ~IndexManager();
+
+  IndexManager(const IndexManager &) = delete;
+  IndexManager &operator=(const IndexManager &) = delete;
 
   Status Load(engine::Context &ctx, const std::string &ns);
   Status Create(engine::Context &ctx, std::unique_ptr<kqir::IndexInfo> info);

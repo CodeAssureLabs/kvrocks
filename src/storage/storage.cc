@@ -744,7 +744,11 @@ rocksdb::Status Storage::writeToDB(engine::Context &ctx, const rocksdb::WriteOpt
     CHECK(ctx.batch == nullptr);
   }
 
-  return db_->Write(options, updates);
+  auto s = db_->Write(options, updates);
+  if (s.ok()) {
+    notifyIndexHooks(ctx, *updates);
+  }
+  return s;
 }
 
 rocksdb::Status Storage::Delete(engine::Context &ctx, const rocksdb::WriteOptions &options,
