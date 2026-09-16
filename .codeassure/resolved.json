@@ -8,10 +8,6 @@
       "layer": "entry"
     },
     {
-      "glob": "src/server/**",
-      "layer": "entry"
-    },
-    {
       "glob": "src/commands/**",
       "layer": "api"
     },
@@ -42,6 +38,10 @@
     {
       "glob": "src/config/**",
       "layer": "config"
+    },
+    {
+      "glob": "src/server/**",
+      "layer": "api"
     }
   ],
   "compiled_rules": {
@@ -55,6 +55,7 @@
         "config"
       ],
       "api": [
+        "entry",
         "service",
         "domain",
         "data",
