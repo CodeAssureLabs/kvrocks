@@ -3,7 +3,7 @@ manifest_version: 1
 repo: CodeAssureLabs/kvrocks
 layers:
   entry: [api, service, domain, data]
-  api: [service, domain, data]
+  api: [entry, service, domain, data]
   service: [domain, data]
   domain: [data]
   data: []
@@ -36,11 +36,11 @@ required_companions:
 invariants:
   - id: no-raw-thread-in-storage
     within: "src/storage/**"
-    forbid_pattern: '\\bstd::thread\\b'
+    forbid_pattern: '\bstd::thread\b'
     reason: "storage uses the server's task runner, never raw std::thread"
     check: detect_only
   - id: no-curl-in-storage
     within: "src/storage/**"
-    forbid_pattern: '#include\\s*<curl'
+    forbid_pattern: '#include\s*<curl'
     reason: "network clients live in a service, not in the storage engine"
     check: detect_only
