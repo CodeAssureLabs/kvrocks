@@ -42,6 +42,7 @@
 #include "common/keyspace_events.h"
 #include "common/port.h"
 #include "config/config.h"
+#include "index_hook.h"
 #include "lock_manager.h"
 #include "observer_or_unique.h"
 #include "rocksdb/write_batch.h"
@@ -315,6 +316,13 @@ class Storage {
   Status CommitTxn();
   ObserverOrUniquePtr<rocksdb::WriteBatchBase> GetWriteBatchBase();
 
+  /// Index hooks are notified after every write batch committed through Storage::Write.
+  /// The storage engine does not own the hook: the caller must unregister it before it is destroyed.
+  /// Registering the same hook twice is a no-op.
+  void RegisterIndexHook(IndexHook *hook);
+  void UnregisterIndexHook(IndexHook *hook);
+  size_t IndexHookCount();
+
   Storage(const Storage &) = delete;
   Storage &operator=(const Storage &) = delete;
 
@@ -408,7 +416,12 @@ class Storage {
   // rocksdb used global block cache
   std::shared_ptr<rocksdb::Cache> shared_block_cache_;
 
+  // Hooks registered by upper layers (see index_hook.h); guarded by index_hooks_mu_.
+  std::vector<IndexHook *> index_hooks_;
+  std::shared_mutex index_hooks_mu_;
+
   rocksdb::Status writeToDB(engine::Context &ctx, const rocksdb::WriteOptions &options, rocksdb::WriteBatch *updates);
+  void notifyIndexHooks(engine::Context &ctx, const rocksdb::WriteBatch &updates);
   void recordKeyspaceStat(const rocksdb::ColumnFamilyHandle *column_family, const rocksdb::Status &s);
   Status applyWriteBatch(const rocksdb::WriteOptions &options, rocksdb::WriteBatch *batch);
   rocksdb::Status ingestSST(rocksdb::ColumnFamilyHandle *cf_handle, const rocksdb::IngestExternalFileOptions &options,

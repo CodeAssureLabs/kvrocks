@@ -26,6 +26,7 @@
 #include <memory>
 
 #include "search/index_info.h"
+#include "search/index_manager.h"
 #include "search/search_encoding.h"
 #include "storage/redis_metadata.h"
 #include "types/redis_hash.h"
@@ -323,4 +324,36 @@ TEST_F(IndexerTest, JsonHnswVector) {
     std::vector<double> expected = {1, 2, 3};
     EXPECT_EQ(expected, node_meta.vector);
   }
+}
+
+TEST_F(IndexerTest, WriteHookRegisteredByIndexManager) {
+  redis::Hash db(storage_.get(), ns);
+  const std::string key = "idxtesthash:hook";
+
+  ASSERT_EQ(storage_->IndexHookCount(), 0u);
+  const auto epoch0 = indexer.WriteEpoch();
+
+  {
+    // IndexManager owns the registration of the indexer as the storage's index hook.
+    redis::IndexManager index_mgr(&indexer, storage_.get());
+    ASSERT_EQ(storage_->IndexHookCount(), 1u);
+
+    uint64_t cnt = 0;
+    auto s = db.Set(*ctx_, key, "x", "food", &cnt);
+    ASSERT_TRUE(s.ok());
+    const auto epoch1 = indexer.WriteEpoch();
+    ASSERT_GT(epoch1, epoch0);
+
+    s = db.Set(*ctx_, key, "y", "1", &cnt);
+    ASSERT_TRUE(s.ok());
+    ASSERT_GT(indexer.WriteEpoch(), epoch1);
+  }
+
+  // Once the manager is gone, the indexer no longer observes writes.
+  ASSERT_EQ(storage_->IndexHookCount(), 0u);
+  const auto epoch2 = indexer.WriteEpoch();
+  uint64_t cnt = 0;
+  auto s = db.Set(*ctx_, key, "x", "kitchen", &cnt);
+  ASSERT_TRUE(s.ok());
+  ASSERT_EQ(indexer.WriteEpoch(), epoch2);
 }

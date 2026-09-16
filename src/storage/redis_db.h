@@ -68,6 +68,11 @@ struct RedisSortObject {
 
 /// Database is a wrapper of underlying storage engine, it provides
 /// some common operations for redis commands.
+///
+/// Every mutation issued through Database (and the type wrappers deriving from it)
+/// is committed via Storage::Write, so registered engine::IndexHook instances observe
+/// it. Subclasses must not write to the raw rocksdb::DB directly, or secondary index
+/// maintainers will miss the change.
 class Database {
  public:
   static constexpr uint64_t RANDOM_KEY_SCAN_LIMIT = 60;

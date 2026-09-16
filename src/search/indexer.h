@@ -22,6 +22,8 @@
 
 #include <tsl/htrie_map.h>
 
+#include <atomic>
+#include <cstdint>
 #include <deque>
 #include <map>
 #include <utility>
@@ -32,6 +34,7 @@
 #include "index_info.h"
 #include "indexer.h"
 #include "search/search_encoding.h"
+#include "storage/index_hook.h"
 #include "storage/redis_metadata.h"
 #include "storage/storage.h"
 #include "types/redis_hash.h"
@@ -96,7 +99,12 @@ struct IndexUpdater {
                                HnswVectorFieldMetadata *vector);
 };
 
-struct GlobalIndexer {
+/// GlobalIndexer maintains the secondary (search) indexes.
+///
+/// It is also the storage engine's engine::IndexHook: the storage layer does not know
+/// about search, so the indexer subscribes to it (see IndexManager, which owns the
+/// registration lifetime) and is told whenever a write batch has been committed.
+struct GlobalIndexer : engine::IndexHook {
   using FieldValues = IndexUpdater::FieldValues;
   struct RecordResult {
     IndexUpdater *updater;
@@ -116,6 +124,17 @@ struct GlobalIndexer {
 
   StatusOr<RecordResult> Record(engine::Context &ctx, std::string_view key, const std::string &ns);
   static Status Update(engine::Context &ctx, const RecordResult &original);
+
+  /// engine::IndexHook: invoked by the storage engine after each committed write batch.
+  void OnWriteCommitted(engine::Context &ctx, const rocksdb::WriteBatch &updates) override;
+
+  /// WriteEpoch is bumped on every committed write observed through the hook.
+  /// Search executors can compare epochs to detect that the indexed data changed
+  /// between planning and execution.
+  uint64_t WriteEpoch() const { return write_epoch_.load(std::memory_order_acquire); }
+
+ private:
+  std::atomic<uint64_t> write_epoch_ = 0;
 };
 
 }  // namespace redis

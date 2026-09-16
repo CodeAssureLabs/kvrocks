@@ -37,6 +37,14 @@
 
 namespace redis {
 
+IndexManager::IndexManager(GlobalIndexer *indexer, engine::Storage *storage) : indexer(indexer), storage(storage) {
+  // The storage engine only knows the engine::IndexHook interface; subscribe the
+  // search indexer here so storage never has to depend on the search layer.
+  storage->RegisterIndexHook(indexer);
+}
+
+IndexManager::~IndexManager() { storage->UnregisterIndexHook(indexer); }
+
 Status IndexManager::Load(engine::Context &ctx, const std::string &ns) {
   // currently index cannot work in cluster mode
   if (storage->GetConfig()->cluster_enabled) {
