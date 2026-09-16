@@ -41,4 +41,12 @@ func TestPing(t *testing.T) {
 		require.NoError(t, c.WriteArgs("ping", "hello", "redis"))
 		c.MustRead(t, "-ERR wrong number of arguments")
 	})
+
+	t.Run("PING echoes an empty message as an empty bulk string", func(t *testing.T) {
+		c := srv.NewTCPClient()
+		defer func() { require.NoError(t, c.Close()) }()
+		require.NoError(t, c.WriteArgs("PING", ""))
+		c.MustRead(t, "$0")
+		c.MustRead(t, "")
+	})
 }

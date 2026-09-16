@@ -37,6 +37,7 @@
 #include "server/server.h"
 #include "stats/disk_stats.h"
 #include "storage/rdb/rdb.h"
+#include "types/redis_ext_ping.h"
 
 namespace redis {
 
@@ -192,13 +193,12 @@ class CommandPing : public Commander {
  public:
   Status Execute([[maybe_unused]] engine::Context &ctx, [[maybe_unused]] Server *srv, [[maybe_unused]] Connection *conn,
                  std::string *output) override {
-    if (args_.size() == 1) {
-      *output = redis::SimpleString("PONG");
-    } else if (args_.size() == 2) {
-      *output = redis::BulkString(args_[1]);
-    } else {
+    if (args_.size() > 2) {
       return {Status::NotOK, errWrongNumOfArguments};
     }
+    // The payload comes from the type layer; RESP framing stays here.
+    ExtPing ping = args_.size() == 2 ? ExtPing(args_[1]) : ExtPing();
+    *output = ping.HasMessage() ? redis::BulkString(ping.Reply()) : redis::SimpleString(ping.Reply());
     return Status::OK();
   }
 };
