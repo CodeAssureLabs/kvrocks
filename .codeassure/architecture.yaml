@@ -1,0 +1,46 @@
+schema_version: 1
+manifest_version: 1
+repo: CodeAssureLabs/kvrocks
+layers:
+  entry: [api, service, domain, data]
+  api: [service, domain, data]
+  service: [domain, data]
+  domain: [data]
+  data: []
+cross_cutting: [utils, config]
+forbidden_edges:
+  - id: types-no-server
+    from: domain
+    to: entry
+    reason: "src/types must not include src/server or src/cli — the type layer is below the request layer"
+    check: blocking
+    severity: high
+  - id: storage-no-service
+    from: data
+    to: service
+    reason: "the storage engine must not include search/cluster (service) code"
+    check: blocking
+    severity: high
+  - id: storage-no-commands
+    from: data
+    to: api
+    reason: "the storage engine must not include command handlers"
+    check: blocking
+    severity: high
+required_companions:
+  - id: command-needs-gocase-test
+    when: "src/commands/cmd_*.cc"
+    require: ["tests/gocase/**/*_test.go"]
+    reason: "a new or changed command needs a gocase integration test"
+    check: detect_only
+invariants:
+  - id: no-raw-thread-in-storage
+    within: "src/storage/**"
+    forbid_pattern: '\\bstd::thread\\b'
+    reason: "storage uses the server's task runner, never raw std::thread"
+    check: detect_only
+  - id: no-curl-in-storage
+    within: "src/storage/**"
+    forbid_pattern: '#include\\s*<curl'
+    reason: "network clients live in a service, not in the storage engine"
+    check: detect_only

@@ -1,0 +1,81 @@
+{
+  "artifact_version": 1,
+  "source_manifest_version": 1,
+  "layer_map": {},
+  "path_globs": [
+    {
+      "glob": "src/cli/**",
+      "layer": "entry"
+    },
+    {
+      "glob": "src/server/**",
+      "layer": "entry"
+    },
+    {
+      "glob": "src/commands/**",
+      "layer": "api"
+    },
+    {
+      "glob": "src/search/**",
+      "layer": "service"
+    },
+    {
+      "glob": "src/cluster/**",
+      "layer": "service"
+    },
+    {
+      "glob": "src/stats/**",
+      "layer": "service"
+    },
+    {
+      "glob": "src/types/**",
+      "layer": "domain"
+    },
+    {
+      "glob": "src/storage/**",
+      "layer": "data"
+    },
+    {
+      "glob": "src/common/**",
+      "layer": "utils"
+    },
+    {
+      "glob": "src/config/**",
+      "layer": "config"
+    }
+  ],
+  "compiled_rules": {
+    "allowed": {
+      "entry": [
+        "api",
+        "service",
+        "domain",
+        "data",
+        "utils",
+        "config"
+      ],
+      "api": [
+        "service",
+        "domain",
+        "data",
+        "utils",
+        "config"
+      ],
+      "service": [
+        "domain",
+        "data",
+        "utils",
+        "config"
+      ],
+      "domain": [
+        "data",
+        "utils",
+        "config"
+      ],
+      "data": [
+        "utils",
+        "config"
+      ]
+    }
+  }
+}
