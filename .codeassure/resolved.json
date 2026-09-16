@@ -55,7 +55,6 @@
         "config"
       ],
       "api": [
-        "entry",
         "service",
         "domain",
         "data",
