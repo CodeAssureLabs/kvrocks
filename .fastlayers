@@ -1,0 +1,4 @@
+{
+  "x.py": "build-infra",
+  "cmake/checks/static_libstdcxx.cc": "build-infra"
+}
