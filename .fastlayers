@@ -1,2 +1,2 @@
-cmake/checks/**: build
-x.py: build
+cmake/checks/**.cc: utils
+x.py: utils
