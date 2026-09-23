@@ -1,0 +1,2 @@
+cmake/checks/**.cc: utils
+x.py: utils
