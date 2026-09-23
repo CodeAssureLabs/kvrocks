@@ -7,7 +7,7 @@ layers:
   service: [domain, data]
   domain: [data]
   data: []
-cross_cutting: [utils, config]
+cross_cutting: [utils, config, build]
 forbidden_edges:
   - id: types-no-server
     from: domain
