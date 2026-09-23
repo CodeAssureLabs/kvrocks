@@ -1,13 +1,22 @@
 schema_version: 1
 manifest_version: 1
 repo: CodeAssureLabs/kvrocks
+modules:
+  cmake_checks:
+    dir: cmake/checks
+    layer: tooling
+  build_helper:
+    dir: "."
+    files: ["x.py"]
+    layer: tooling
 layers:
   entry: [api, service, domain, data]
   api: [service, domain, data]
   service: [domain, data]
   domain: [data]
   data: []
-cross_cutting: [utils, config]
+  tooling: []
+cross_cutting: [utils, config, tooling]
 forbidden_edges:
   - id: types-no-server
     from: domain
