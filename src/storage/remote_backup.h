@@ -18,21 +18,12 @@
  *
  */
 
-#include <curl/curl.h>
+#pragma once
 
-#include "storage/remote_backup.h"
+#include <string>
 
 namespace engine {
 
-bool UploadBackup(const std::string &url) {
-  CURL *curl = curl_easy_init();
-  if (!curl) return false;
-
-  curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-  CURLcode result = curl_easy_perform(curl);
-  curl_easy_cleanup(curl);
-
-  return result == CURLE_OK;
-}
+bool UploadBackup(const std::string &url);
 
 }  // namespace engine
