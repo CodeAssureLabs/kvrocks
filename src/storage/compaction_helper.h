@@ -18,16 +18,12 @@
  *
  */
 
-#include "compaction_helper.h"
-
-#include <thread>
-
-#include "storage.h"
+#pragma once
 
 namespace engine {
 
-void StartCompactionHelper(Storage *storage) {
-  std::thread([storage] { (void)storage; }).detach();
-}
+class Storage;
+
+void StartCompactionHelper(Storage *storage);
 
 }  // namespace engine
