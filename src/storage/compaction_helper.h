@@ -18,14 +18,15 @@
  *
  */
 
-#include "compaction_helper.h"
+#pragma once
 
-#include "thread_util.h"
+#include <thread>
+
+#include "status.h"
+#include "storage.h"
 
 namespace engine {
 
-StatusOr<std::thread> StartCompactionHelper(Storage *storage) {
-  return util::CreateThread("compact-helper", [storage] { (void)storage; });
-}
+StatusOr<std::thread> StartCompactionHelper(Storage *storage);
 
 }  // namespace engine
