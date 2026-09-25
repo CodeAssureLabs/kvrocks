@@ -41,4 +41,13 @@ func TestPing(t *testing.T) {
 		require.NoError(t, c.WriteArgs("ping", "hello", "redis"))
 		c.MustRead(t, "-ERR wrong number of arguments")
 	})
+
+	t.Run("PING2", func(t *testing.T) {
+		c := srv.NewTCPClient()
+		defer func() { require.NoError(t, c.Close()) }()
+		require.NoError(t, c.WriteArgs("PING2"))
+		c.MustRead(t, "+PONG2")
+		require.NoError(t, c.WriteArgs("ping2", "hello"))
+		c.MustRead(t, "-ERR wrong number of arguments")
+	})
 }

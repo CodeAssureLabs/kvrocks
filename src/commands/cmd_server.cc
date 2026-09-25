@@ -203,6 +203,15 @@ class CommandPing : public Commander {
   }
 };
 
+class CommandPing2 : public Commander {
+ public:
+  Status Execute([[maybe_unused]] engine::Context &ctx, [[maybe_unused]] Server *srv, [[maybe_unused]] Connection *conn,
+                 std::string *output) override {
+    *output = redis::SimpleString("PONG2");
+    return Status::OK();
+  }
+};
+
 class CommandSelect : public Commander {
  public:
   Status Execute([[maybe_unused]] engine::Context &ctx, Server *srv, Connection *conn, std::string *output) override {
@@ -1783,6 +1792,7 @@ class CommandLatency : public Commander {
 REDIS_REGISTER_COMMANDS(
     Server, MakeCmdAttr<CommandAuth>("auth", 2, "read-only ok-loading auth", NO_KEY),
     MakeCmdAttr<CommandPing>("ping", -1, "read-only", NO_KEY),
+    MakeCmdAttr<CommandPing2>("ping2", 1, "read-only", NO_KEY),
     MakeCmdAttr<CommandSelect>("select", 2, "read-only", NO_KEY),
     MakeCmdAttr<CommandInfo>("info", -1, "read-only ok-loading", NO_KEY),
     MakeCmdAttr<CommandRole>("role", 1, "read-only ok-loading", NO_KEY),
