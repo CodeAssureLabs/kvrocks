@@ -18,20 +18,14 @@
  *
  */
 
-#include "remote_backup.h"
-
-#include <curl/curl.h>
+#pragma once
 
 #include <string>
 
+#include "status.h"
+
 namespace engine {
 
-Status UploadBackup(const std::string &url) {
-  CURL *c = curl_easy_init();
-  if (!c) return {Status::NotOK, "failed to initialize the curl handle"};
-  curl_easy_setopt(c, CURLOPT_URL, url.c_str());
-  curl_easy_cleanup(c);
-  return Status::OK();
-}
+Status UploadBackup(const std::string &url);
 
 }  // namespace engine
