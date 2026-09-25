@@ -196,8 +196,10 @@ else()
 endif()
 
 find_package(Threads REQUIRED)
+find_package(CURL REQUIRED)
 
 list(APPEND EXTERNAL_LIBS snappy)
+list(APPEND EXTERNAL_LIBS CURL::libcurl)
 list(APPEND EXTERNAL_LIBS rocksdb_with_headers)
 list(APPEND EXTERNAL_LIBS event_with_headers)
 list(APPEND EXTERNAL_LIBS lz4)
@@ -322,5 +324,3 @@ add_executable(unittest ${TESTS_SRCS})
 target_include_directories(unittest PRIVATE tests/cppunit)
 
 target_link_libraries(unittest PRIVATE kvrocks_objs gtest_main gmock ${EXTERNAL_LIBS})
-
-find_package(CURL REQUIRED)
