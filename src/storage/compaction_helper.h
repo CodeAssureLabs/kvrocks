@@ -18,23 +18,12 @@
  *
  */
 
-#include "compaction_helper.h"
+#pragma once
 
-#include "logging.h"
-#include "thread_util.h"
+#include "storage.h"
 
 namespace engine {
 
-void StartCompactionHelper(Storage *storage) {
-  auto s = util::CreateThread("compact-helper", [storage] { (void)storage; });
-  if (!s) {
-    ERROR("[storage] Failed to start compaction helper thread, err: {}", s.Msg());
-    return;
-  }
-
-  if (auto d = util::ThreadDetach(*s); !d) {
-    ERROR("[storage] Failed to detach compaction helper thread, err: {}", d.Msg());
-  }
-}
+void StartCompactionHelper(Storage *storage);
 
 }  // namespace engine
