@@ -6,7 +6,8 @@ namespace redis {
 
 class CommandPing2 : public Commander {
  public:
-  Status Execute([[maybe_unused]] engine::Context &ctx, [[maybe_unused]] Server *srv, [[maybe_unused]] Connection *conn, std::string *output) override {
+  Status Execute([[maybe_unused]] engine::Context &ctx, [[maybe_unused]] Server *srv,
+                 [[maybe_unused]] Connection *conn, std::string *output) override {
     *output = redis::SimpleString("PONG2");
     return Status::OK();
   }
