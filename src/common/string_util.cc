@@ -54,7 +54,7 @@ bool EqualICase(std::string_view lhs, std::string_view rhs) {
 }
 
 std::string Trim(std::string in, std::string_view chars) {
-  if (in.empty()) return in;
+  if (in.empty() || chars.empty()) return in;
 
   in.erase(0, in.find_first_not_of(chars));
   in.erase(in.find_last_not_of(chars) + 1);
