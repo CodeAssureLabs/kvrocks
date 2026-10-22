@@ -39,7 +39,7 @@ std::string ToUpper(std::string in);
 bool EqualICase(std::string_view lhs, std::string_view rhs);
 std::string BytesToHuman(uint64_t n);
 std::string Trim(std::string in, std::string_view chars);
-std::vector<std::string> Split(std::string_view in, std::string_view delim);
+std::vector<std::string> Split(std::string_view in);
 std::vector<std::string> Split2KV(const std::string &in, const std::string &delim);
 
 bool StartsWith(std::string_view str, std::string_view prefix);

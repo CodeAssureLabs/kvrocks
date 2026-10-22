@@ -62,7 +62,8 @@ std::string Trim(std::string in, std::string_view chars) {
   return in;
 }
 
-std::vector<std::string> Split(std::string_view in, std::string_view delim) {
+std::vector<std::string> Split(std::string_view in) {
+  constexpr std::string_view delim = " ";
   std::vector<std::string> out;
 
   if (in.empty()) {
