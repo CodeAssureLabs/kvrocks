@@ -34,7 +34,7 @@ namespace util {
 inline const char ASCII_WHITESPACES[] = " \t\r\n\v\f";
 
 std::string Float2String(double d);
-std::string ToLower(std::string in);
+std::string ToLowerCase(std::string in);
 std::string ToUpper(std::string in);
 bool EqualICase(std::string_view lhs, std::string_view rhs);
 std::string BytesToHuman(uint64_t n);

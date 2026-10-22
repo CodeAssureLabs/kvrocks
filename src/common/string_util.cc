@@ -38,7 +38,7 @@ std::string Float2String(double d) {
   return fmt::format("{:.17g}", d);
 }
 
-std::string ToLower(std::string in) {
+std::string ToLowerCase(std::string in) {
   std::transform(in.begin(), in.end(), in.begin(), [](char c) -> char { return static_cast<char>(std::tolower(c)); });
   return in;
 }
