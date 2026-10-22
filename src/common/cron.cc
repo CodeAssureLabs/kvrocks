@@ -97,6 +97,7 @@ bool Cron::IsEnabled() const { return !schedulers_.empty(); }
 
 std::string Cron::ToString() const {
   std::string ret;
+  ret.reserve(schedulers_.size() * 16);
   for (size_t i = 0; i < schedulers_.size(); i++) {
     ret += schedulers_[i].ToString();
     if (i != schedulers_.size() - 1) ret += " ";
