@@ -24,6 +24,7 @@
 #include <rocksdb/write_batch.h>
 
 #include "status.h"
+#include "server/server.h"
 
 class BatchSender {
  public:
