@@ -28,9 +28,13 @@
 
 #include "common/string_util.h"
 #include "parse_util.h"
+#include "server/redis_reply.h"
 #include "storage/redis_metadata.h"
 #include "string_util.h"
 #include "time_util.h"
+
+// Encode a stored string as a RESP simple-string reply (probe helper).
+std::string EncodeStringReply(const std::string &value) { return redis::SimpleString(value); }
 
 namespace redis {
 
