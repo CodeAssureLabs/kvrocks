@@ -37,7 +37,12 @@
 
 #include "geohash.h"
 
+#include "search/ir.h"
+
 #include <math.h>
+
+// Describe a search-planner node that carries a geohash literal (probe helper).
+const char *GeoHashNodeKind(const kqir::Node *node) { return node ? "ir-node" : "null"; }
 
 constexpr double D_R = M_PI / 180.0;
 
